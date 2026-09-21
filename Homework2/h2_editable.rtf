@@ -1,0 +1,649 @@
+{\rtf1\ansi\deff0{\fonttbl{\f0 Calibri;}{\f1 Consolas;}}{\colortbl;\red0\green0\blue0;\red66\green112\blue64;\red152\green64\blue29;\red108\green54\blue140;\red22\green77\blue157;}\paperw12240\paperh15840\margl936\margr936\margt864\margb864\pard\f0\fs42\b\sl500\slmult0\sa240 \cf1 Python Programming Homework 2\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Full name: Jorge Alfaro\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 FAU ID: Z23697022\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Instructor: Dr. Ionut Cardei\par
+\pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Draft status\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 This report contains the solutions for Problems 1 through 5 and the Problem 3 extra-credit tests. Required screenshots and VSCode coding-agent evidence are still pending.\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Before submission, insert authentic screenshots in the marked locations and regenerate the PDF from the final Word document.\par
+\pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Contents\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Problem 1  Python file parsing\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Problem 2  Comprehensions\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Problem 3  Social network and extra credit\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Problem 4  IMDB rankings\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Problem 5  Weather station analyzer and unit tests\par
+\pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Implementation notes\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 The programs use Python 3.10 or newer and only standard-library modules, plus the supplied testif module. Problem 4 uses a p4 filename because its p3 filename in the handout would overwrite Problem 3.\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 Problem 5 parses the example date format with datetime and retains the original date strings. Statistics output uses the columns station, min, max, mean, with stations in lexicographic order and one decimal place.\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 1 Python file parsing\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p1_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 """Problem 1: number source lines and extract Python functions."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  ast\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  io\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  pathlib \cf5 import\cf1  Path\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  tokenize\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  line_number(input_file: str, output_file: str) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Copy a text file, prefixing every line with its 1-based number."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         source, target = Path(input_file), Path(output_file)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  source.resolve() == target.resolve() \cf5 or\cf1  (\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 target.exists() \cf5 and\cf1  source.samefile(target)):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 raise\cf1  ValueError(\cf3 "Input and output must be different files."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  source.open(encoding=\cf3 "utf-8"\cf1 ) \cf5 as\cf1  reader:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             lines = reader.readlines()\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  target.open(\cf3 "w"\cf1 , encoding=\cf3 "utf-8"\cf1 ) \cf5 as\cf1  writer:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 for\cf1  number, line \cf5 in\cf1  enumerate(lines, \cf4 1\cf1 ):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 writer.write(f"\{number\}: \{line\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (OSError, UnicodeError, ValueError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Could not number the file: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  parse_functions(filename: str) -> tuple[tuple[int, str, str, str], ...]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Return functions sorted by name as (line, name, arguments, code).\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     Include nested functions and methods. Keep docstrings and '#' inside\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     strings; remove comment tokens and empty lines from the returned code.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     """\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  tokenize.open(filename) \cf5 as\cf1  reader:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             source = reader.read()\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         functions = []\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  node \cf5 in\cf1  ast.walk(ast.parse(source, filename)):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 if\cf1  \cf5 not\cf1  isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 continue\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             code = ast.get_source_segment(source, node)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             lines = code.splitlines(keepends=\cf5 True\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             tokens = list(tokenize.generate_tokens(io.StringIO(code).readline))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             depth, start, end = \cf4 0\cf1 , \cf5 None\cf1 , \cf5 None\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             offsets = [\cf4 0\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 for\cf1  line \cf5 in\cf1  lines:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 offsets.append(offsets[-\cf4 1\cf1 ] + len(line))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 for\cf1  token \cf5 in\cf1  tokens:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 if\cf1  token.type == tokenize.COMMENT:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     row, column = token.start\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     lines[row - \cf4 1\cf1 ] = lines[row - \cf4 1\cf1 ][:column] + \cf3 "\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 if\cf1  token.type == tokenize.OP \cf5 and\cf1  end \cf5 is\cf1  \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     \cf5 if\cf1  token.string == \cf3 "("\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         \cf5 if\cf1  start \cf5 is\cf1  \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                             start = offsets[token.end[\cf4 0\cf1 ] - \cf4 1\cf1 ] + token.end[\cf4 1\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         depth += \cf4 1\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     \cf5 elif\cf1  token.string == \cf3 ")"\cf1  \cf5 and\cf1  start \cf5 is\cf1  \cf5 not\cf1  \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         depth -= \cf4 1\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         \cf5 if\cf1  depth == \cf4 0\cf1 :\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 1 Python file parsing continued\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p1_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                             end = offsets[token.start[\cf4 0\cf1 ] - \cf4 1\cf1 ] + token.start[\cf4 1\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             arguments = code[start:end]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             cleaned = \cf3 "\\n"\cf1 .join(line.rstrip() \cf5 for\cf1  line \cf5 in\cf1  lines \cf5 if\cf1  line.strip())\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             functions.append((node.lineno, node.name, arguments, cleaned + \cf3 "\\n"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  tuple(sorted(functions, key=\cf5 lambda\cf1  item: item[\cf4 1\cf1 ]))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (OSError, UnicodeError, SyntaxError, tokenize.TokenError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Could not parse Python functions: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  main() -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Demonstrate both functions using this source file."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "Student: Jorge Alfaro | FAU ID: Z23697022 | Problem 1"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     source = Path(__file__).resolve()\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     destination = str(source) + \cf3 ".txt"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     line_number(str(source), destination)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(f"Numbered source saved to \{destination\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(parse_functions(str(source)))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 if\cf1  __name__ == \cf3 "__main__"\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     main()\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \par
+\pard\f0\fs22\b\sl280\slmult0\sa140 \cf1 Required screenshots\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 [Insert authentic program-output screenshots showing parts a and b. Your name or FAU ID must be visible when captured and must not be added to the images.]\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 2 Comprehensions\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p2_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 """Problem 2: list and dictionary comprehensions."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  main() -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Display the answers for parts a through f."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "Student: Jorge Alfaro | FAU ID: Z23697022 | Problem 2"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf2 # a. Include every ordered tuple of four distinct integers.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     equal_squares = [\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         (a, b, c, d)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  a \cf5 in\cf1  range(\cf4 1\cf1 , \cf4 11\cf1 ) \cf5 for\cf1  b \cf5 in\cf1  range(\cf4 1\cf1 , \cf4 11\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  c \cf5 in\cf1  range(\cf4 1\cf1 , \cf4 11\cf1 ) \cf5 for\cf1  d \cf5 in\cf1  range(\cf4 1\cf1 , \cf4 11\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  len(\{a, b, c, d\}) == \cf4 4\cf1  \cf5 and\cf1  a * a + b * b == c * c + d * d\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "a:"\cf1 , equal_squares)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf2 # b. Lowercase words whose original length is less than five.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     words = [\cf3 'One'\cf1 , \cf3 'SEVEN'\cf1 , \cf3 'three'\cf1 , \cf3 'two'\cf1 , \cf3 'Ten'\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     short_words = [(word.lower(), len(word)) \cf5 for\cf1  word \cf5 in\cf1  words \cf5 if\cf1  len(word) < \cf4 5\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "b:"\cf1 , short_words)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf2 # c. Abbreviate the middle name in each three-part name.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     names = [\cf3 'Christopher Ashton Kutcher'\cf1 , \cf3 'Elizabeth Stamatina Fey'\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     abbreviated = [\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         f"\{first\} \{middle[\cf4 0\cf1 ]\}. \{last\}"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  name \cf5 in\cf1  names \cf5 for\cf1  first, middle, last \cf5 in\cf1  [name.split()]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "c:"\cf1 , abbreviated)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf2 # d. Compare sorted lowercase characters to identify anagrams.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     lst1 = [\cf3 "Spam"\cf1 , \cf3 "Trams"\cf1 , \cf3 "Elbows"\cf1 , \cf3 "Tops"\cf1 , \cf3 "Astral"\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     lst2 = [\cf3 "Bowels"\cf1 , \cf3 "Sample"\cf1 , \cf3 "Altars"\cf1 , \cf3 "Stop"\cf1 , \cf3 "Course"\cf1 , \cf3 "Smart"\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     anagrams = [(w1, w2) \cf5 for\cf1  w1 \cf5 in\cf1  lst1 \cf5 for\cf1  w2 \cf5 in\cf1  lst2\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 if\cf1  sorted(w1.lower()) == sorted(w2.lower())]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "d:"\cf1 , anagrams)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf2 # e. Map each distinct string to its length.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     s = [\cf3 'one'\cf1 , \cf3 'two'\cf1 , \cf3 'three'\cf1 ]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     lengths = \{word: len(word) \cf5 for\cf1  word \cf5 in\cf1  s\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "e:"\cf1 , lengths)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf2 # f. Retain vowel positions and their original character case.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     text = \cf3 "Hello world"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     vowels = \{i: c \cf5 for\cf1  i, c \cf5 in\cf1  enumerate(text) \cf5 if\cf1  c.lower() \cf5 in\cf1  \cf3 "aeiou"\cf1 \}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "f:"\cf1 , vowels)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 if\cf1  __name__ == \cf3 "__main__"\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     main()\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \par
+\pard\f0\fs22\b\sl280\slmult0\sa140 \cf1 Required screenshots\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 [Insert authentic program-output screenshots showing parts a through f. Your name or FAU ID must be visible when captured and must not be added to the images.]\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 3 Social network\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p3_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 """Problem 3: a social network with CSV persistence and extra-credit tests."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  csv\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  pathlib \cf5 import\cf1  Path\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  tempfile \cf5 import\cf1  TemporaryDirectory\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  testif \cf5 import\cf1  testif\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 Network = dict[str, tuple[str, list[str]]]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  add_user(sn: Network, username: str, fullname: str) -> bool:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Add a user with no friends; return False for an existing username."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  username \cf5 in\cf1  sn:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 return\cf1  \cf5 False\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         sn[username] = (fullname, [])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  \cf5 True\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (TypeError, ValueError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Could not add the user: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  add_friend(sn: Network, user1: str, user2: str) -> bool:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Add a mutual link; reject missing users, self-links and existing links."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  user1 \cf5 not\cf1  \cf5 in\cf1  sn \cf5 or\cf1  user2 \cf5 not\cf1  \cf5 in\cf1  sn \cf5 or\cf1  user1 == user2:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 return\cf1  \cf5 False\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  user2 \cf5 in\cf1  sn[user1][\cf4 1\cf1 ] \cf5 and\cf1  user1 \cf5 in\cf1  sn[user2][\cf4 1\cf1 ]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 return\cf1  \cf5 False\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  user2 \cf5 not\cf1  \cf5 in\cf1  sn[user1][\cf4 1\cf1 ]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             sn[user1][\cf4 1\cf1 ].append(user2)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  user1 \cf5 not\cf1  \cf5 in\cf1  sn[user2][\cf4 1\cf1 ]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             sn[user2][\cf4 1\cf1 ].append(user1)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  \cf5 True\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (TypeError, KeyError, IndexError, AttributeError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Could not add the friendship: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  get_friends(sn: Network, user1: str, distance: int) -> list[str]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Return unique friends within distance links in breadth-first order."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  \cf5 not\cf1  isinstance(distance, int) \cf5 or\cf1  isinstance(distance, bool) \cf5 or\cf1  distance < \cf4 1\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 raise\cf1  ValueError(\cf3 "Distance must be a positive integer."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  user1 \cf5 not\cf1  \cf5 in\cf1  sn:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 return\cf1  []\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         seen, frontier, result = \{user1\}, [user1], []\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  _ \cf5 in\cf1  range(distance):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             following = []\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 for\cf1  user \cf5 in\cf1  frontier:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 for\cf1  friend \cf5 in\cf1  sn[user][\cf4 1\cf1 ]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     \cf5 if\cf1  friend \cf5 not\cf1  \cf5 in\cf1  seen:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         seen.add(friend)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         following.append(friend)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         result.append(friend)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             frontier = following\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 3 Social network continued\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p3_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 if\cf1  \cf5 not\cf1  frontier:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 break\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  result\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (TypeError, ValueError, KeyError, IndexError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Could not find friends: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  save_network(filename: str, sn: Network) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Save headerless CSV rows: username, full name, then each friend."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  open(filename, \cf3 "w"\cf1 , newline=\cf3 ""\cf1 , encoding=\cf3 "utf-8"\cf1 ) \cf5 as\cf1  file:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             writer = csv.writer(file)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 for\cf1  username, (fullname, friends) \cf5 in\cf1  sn.items():\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 writer.writerow([username, fullname, *friends])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (OSError, UnicodeError, csv.Error, TypeError, ValueError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Could not save the network: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  load_network(filename: str) -> Network:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Read a network saved by save_network, rejecting malformed rows."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         network = \{\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  open(filename, newline=\cf3 ""\cf1 , encoding=\cf3 "utf-8"\cf1 ) \cf5 as\cf1  file:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 for\cf1  row \cf5 in\cf1  csv.reader(file):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 if\cf1  len(row) < \cf4 2\cf1  \cf5 or\cf1  row[\cf4 0\cf1 ] \cf5 in\cf1  network:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     \cf5 raise\cf1  ValueError(\cf3 "Missing fields or duplicate username."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 network[row[\cf4 0\cf1 ]] = (row[\cf4 1\cf1 ], row[\cf4 2\cf1 :])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  network\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (OSError, UnicodeError, csv.Error, ValueError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Could not load the network: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  test() -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Test parts a-e with the supplied testif function (extra credit)."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         sn = \{\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results = []\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  user, name \cf5 in\cf1  [(\cf3 "alice"\cf1 , \cf3 "Alice Smith"\cf1 ), (\cf3 "maria"\cf1 , \cf3 "Maria Cortez"\cf1 ),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                            (\cf3 "joe"\cf1 , \cf3 "Joseph Adams"\cf1 ), (\cf3 "eve"\cf1 , \cf3 "Evelyn Cooper"\cf1 ),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                            (\cf3 "david"\cf1 , \cf3 "David Benson"\cf1 )]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             results.append(testif(add_user(sn, user, name), f"add \{user\}"))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(\cf5 not\cf1  add_user(sn, \cf3 "alice"\cf1 , \cf3 "Other"\cf1 ), \cf3 "duplicate user"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  left, right \cf5 in\cf1  [(\cf3 "alice"\cf1 , \cf3 "maria"\cf1 ), (\cf3 "maria"\cf1 , \cf3 "joe"\cf1 ),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                             (\cf3 "joe"\cf1 , \cf3 "eve"\cf1 ), (\cf3 "maria"\cf1 , \cf3 "david"\cf1 )]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             results.append(testif(add_friend(sn, left, right), f"link \{left\}-\{right\}"))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(\cf5 not\cf1  add_friend(sn, \cf3 "alice"\cf1 , \cf3 "missing"\cf1 ), \cf3 "missing user"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(\cf5 not\cf1  add_friend(sn, \cf3 "alice"\cf1 , \cf3 "alice"\cf1 ), \cf3 "self-link"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(\cf5 not\cf1  add_friend(sn, \cf3 "alice"\cf1 , \cf3 "maria"\cf1 ), \cf3 "duplicate link"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(get_friends(sn, \cf3 "alice"\cf1 , \cf4 1\cf1 ) == [\cf3 "maria"\cf1 ], \cf3 "distance 1"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(get_friends(sn, \cf3 "alice"\cf1 , \cf4 2\cf1 ) == [\cf3 "maria"\cf1 , \cf3 "joe"\cf1 , \cf3 "david"\cf1 ],\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                               \cf3 "distance 2"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(get_friends(sn, \cf3 "alice"\cf1 , \cf4 20\cf1 ) ==\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                               [\cf3 "maria"\cf1 , \cf3 "joe"\cf1 , \cf3 "david"\cf1 , \cf3 "eve"\cf1 ], \cf3 "cycles"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(get_friends(sn, \cf3 "unknown"\cf1 , \cf4 2\cf1 ) == [], \cf3 "unknown user"\cf1 ))\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 3 Social network continued\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p3_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         add_user(sn, \cf3 "solo"\cf1 , \cf3 'Solo, "Student"'\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         results.append(testif(get_friends(sn, \cf3 "solo"\cf1 , \cf4 1\cf1 ) == [], \cf3 "isolated user"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  TemporaryDirectory() \cf5 as\cf1  folder:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             filename = str(Path(folder) / \cf3 "network.csv"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             save_network(filename, sn)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             results.append(testif(Path(filename).is_file(), \cf3 "save network"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             results.append(testif(load_network(filename) == sn, \cf3 "CSV round trip"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  \cf5 not\cf1  all(results):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 raise\cf1  AssertionError(\cf3 "A social network test failed."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (OSError, ValueError, TypeError, AssertionError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Social network tests could not complete: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  main() -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Run the tests for all social network operations."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(\cf3 "Student: Jorge Alfaro | FAU ID: Z23697022 | Problem 3"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         test()\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (OSError, ValueError, TypeError, AssertionError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Problem 3 could not finish: \{error\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 if\cf1  __name__ == \cf3 "__main__"\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     main()\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \par
+\pard\f0\fs22\b\sl280\slmult0\sa140 \cf1 Required screenshots\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 [Insert authentic program-output screenshots showing parts a through g. Your name or FAU ID must be visible when captured and must not be added to the images.]\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 4 IMDB rankings\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p4_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 """Problem 4: rank director-actor collaborations and actor box office."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  csv\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  pathlib \cf5 import\cf1  Path\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 DATA_DIRECTORY = Path(__file__).resolve().parent\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  read_movies(filename: str, value_column: str) -> dict[tuple[str, str], float]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Map (title, year) to a numeric value from a CSV with a header."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 with\cf1  open(filename, newline=\cf3 ""\cf1 , encoding=\cf3 "utf-8"\cf1 ) \cf5 as\cf1  file:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  \{(row[\cf3 "Title"\cf1 ], row[\cf3 "Year"\cf1 ]): float(row[value_column])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 for\cf1  row \cf5 in\cf1  csv.DictReader(file)\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  read_casts(filename: str) -> dict[tuple[str, str], tuple[str, list[str]]]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Map (title, year) to (director, actors) from the headerless cast CSV."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 with\cf1  open(filename, newline=\cf3 ""\cf1 , encoding=\cf3 "utf-8"\cf1 ) \cf5 as\cf1  file:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  \{(row[\cf4 0\cf1 ], row[\cf4 1\cf1 ]): (row[\cf4 2\cf1 ], row[\cf4 3\cf1 :]) \cf5 for\cf1  row \cf5 in\cf1  csv.reader(file)\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  display_ranking(totals: dict, limit: int | \cf5 None\cf1  = \cf5 None\cf1 ) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Print descending totals; None displays all and zero displays none."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 if\cf1  limit \cf5 is\cf1  \cf5 not\cf1  \cf5 None\cf1  \cf5 and\cf1  limit < \cf4 0\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 raise\cf1  ValueError(\cf3 "The display limit cannot be negative."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     ranking = sorted(totals.items(), key=\cf5 lambda\cf1  item: (-item[\cf4 1\cf1 ], item[\cf4 0\cf1 ]))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 for\cf1  rank, (key, total) \cf5 in\cf1  enumerate(ranking[:limit], \cf4 1\cf1 ):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  isinstance(key, tuple):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             print(f"\{rank:2\}. \{(key[\cf4 0\cf1 ], key[\cf4 1\cf1 ], total)\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 else\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             print(f"\{rank:2\}. \{key\}: $\{total:,.0f\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  display_top_collaborations(limit: int | \cf5 None\cf1  = \cf5 None\cf1 ) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Rank director-actor pairs by number of shared top-rated movies."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     rated = read_movies(str(DATA_DIRECTORY / \cf3 "imdb-top-rated.csv"\cf1 ), \cf3 "IMDb Rating"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     casts = read_casts(str(DATA_DIRECTORY / \cf3 "imdb-top-casts.csv"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     totals = \{\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 for\cf1  movie \cf5 in\cf1  rated:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         director, actors = casts[movie]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  actor \cf5 in\cf1  set(actors):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             pair = (director, actor)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             totals[pair] = totals.get(pair, \cf4 0\cf1 ) + \cf4 1\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     display_ranking(totals, limit)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  display_top_actors(limit: int | \cf5 None\cf1  = \cf5 None\cf1 ) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Rank actors by the sum of their movies' top-grossing box office."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     grossing = read_movies(str(DATA_DIRECTORY / \cf3 "imdb-top-grossing.csv"\cf1 ),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                           \cf3 "USA Box Office"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     casts = read_casts(str(DATA_DIRECTORY / \cf3 "imdb-top-casts.csv"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     totals = \{\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 for\cf1  movie, amount \cf5 in\cf1  grossing.items():\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  actor \cf5 in\cf1  set(casts[movie][\cf4 1\cf1 ]):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             totals[actor] = totals.get(actor, \cf4 0\cf1 ) + int(amount)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     display_ranking(totals, limit)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 4 IMDB rankings continued\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p4_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  main() -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Demonstrate both rankings, each limited to ten entries."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "Student: Jorge Alfaro | FAU ID: Z23697022 | Problem 4"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "Top director-actor collaborations"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     display_top_collaborations(\cf4 10\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "\\nTop actors by USA box office"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     display_top_actors(\cf4 10\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 if\cf1  __name__ == \cf3 "__main__"\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     main()\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \par
+\pard\f0\fs22\b\sl280\slmult0\sa140 \cf1 Required screenshots\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 [Insert authentic program-output screenshots showing both rankings limited to ten entries. Your name or FAU ID must be visible when captured and must not be added to the images.]\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 5 Weather station analyzer\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p5_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 """Problem 5: weather observations, statistics and outliers.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 Input is headerless CSV: station,date,temperature. Dates use\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 %I:%M:%S %p %m/%d/%Y. Output CSV contains station,min,max,mean.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 Run: python p5_Alfaro_Jorge.py observations.csv statistics.csv\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 """\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  csv\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  datetime \cf5 import\cf1  datetime\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  sys\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 DATE_FORMAT = \cf3 "%I:%M:%S %p %m/%d/%Y"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 Observations = dict[str, list[tuple[str, float]]]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 Statistics = dict[str, tuple[float, float, float]]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  read_observations(filename: str) -> tuple[Observations, list[tuple[int, str]]]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Read valid observations in chronological order and report bad lines.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     The first valid observation for a station and parsed date wins.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     File-access errors propagate to the caller.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     """\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     observations, errors, seen = \{\}, [], set()\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 with\cf1  open(filename, encoding=\cf3 "utf-8"\cf1 ) \cf5 as\cf1  file:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  line_number, line \cf5 in\cf1  enumerate(file, \cf4 1\cf1 ):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 row = next(csv.reader([line], strict=\cf5 True\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 if\cf1  len(row) != \cf4 3\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     \cf5 raise\cf1  ValueError(\cf3 "Expected station,date,temperature."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 station, date, text = (field.strip() \cf5 for\cf1  field \cf5 in\cf1  row)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 if\cf1  \cf5 not\cf1  station:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     \cf5 raise\cf1  ValueError(\cf3 "Station cannot be empty."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 timestamp = datetime.strptime(date, DATE_FORMAT)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 temperature = float(text)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 if\cf1  \cf5 not\cf1  -\cf4 100.0\cf1  <= temperature <= \cf4 150.0\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     \cf5 raise\cf1  ValueError(\cf3 "Temperature must be between -100 and 150."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 key = (station, timestamp)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 if\cf1  key \cf5 in\cf1  seen:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     \cf5 raise\cf1  ValueError(\cf3 "Duplicate station/date observation."\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 seen.add(key)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 observations.setdefault(station, []).append((date, temperature))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 except\cf1  (ValueError, csv.Error) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 errors.append((line_number, str(error)))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 for\cf1  records \cf5 in\cf1  observations.values():\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         records.sort(key=\cf5 lambda\cf1  item: datetime.strptime(item[\cf4 0\cf1 ], DATE_FORMAT))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 return\cf1  observations, errors\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  station_statistics(observations: Observations) -> Statistics:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Map each nonempty station to its minimum, maximum and mean."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     statistics = \{\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 for\cf1  station, records \cf5 in\cf1  observations.items():\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 if\cf1  records:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             temperatures = [temperature \cf5 for\cf1  _, temperature \cf5 in\cf1  records]\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             statistics[station] = (min(temperatures), max(temperatures),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                                    sum(temperatures) / len(temperatures))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 return\cf1  statistics\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 5 Weather station analyzer continued\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 p5_Alfaro_Jorge.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  station_outliers(observations: Observations) -> dict[str, tuple[str, float, float]]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Map stations whose latest value exceeds their mean to (date, value, mean).\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     Observations must be chronologically sorted, as read_observations returns.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     """\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     statistics = station_statistics(observations)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 return\cf1  \{station: (*records[-\cf4 1\cf1 ], statistics[station][\cf4 2\cf1 ])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 for\cf1  station, records \cf5 in\cf1  observations.items()\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 if\cf1  records \cf5 and\cf1  records[-\cf4 1\cf1 ][\cf4 1\cf1 ] > statistics[station][\cf4 2\cf1 ]\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  write_statistics(filename: str, statistics: Statistics) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Write stations alphabetically, with all numbers to one decimal place."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 with\cf1  open(filename, \cf3 "w"\cf1 , newline=\cf3 ""\cf1 , encoding=\cf3 "utf-8"\cf1 ) \cf5 as\cf1  file:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         writer = csv.writer(file)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         writer.writerow([\cf3 "station"\cf1 , \cf3 "min"\cf1 , \cf3 "max"\cf1 , \cf3 "mean"\cf1 ])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  station \cf5 in\cf1  sorted(statistics):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             writer.writerow([station, *(f"\{value:.1f\}"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                                         \cf5 for\cf1  value \cf5 in\cf1  statistics[station])])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  main() -> int:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Read command-line paths, report results and handle file-access errors."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     print(\cf3 "Student: Jorge Alfaro | FAU ID: Z23697022 | Problem 5"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 if\cf1  len(sys.argv) != \cf4 3\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Usage: \{sys.argv[\cf4 0\cf1 ]\} INPUT.csv OUTPUT.csv", file=sys.stderr)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  \cf4 1\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 try\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         observations, errors = read_observations(sys.argv[\cf4 1\cf1 ])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         statistics = station_statistics(observations)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(\cf3 "Statistics (minimum, maximum, mean)"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  station \cf5 in\cf1  sorted(statistics):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             values = \cf3 ", "\cf1 .join(f"\{value:.1f\}" \cf5 for\cf1  value \cf5 in\cf1  statistics[station])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             print(f"\{station\}: \{values\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(\cf3 "Outliers (date, temperature, mean)"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         outliers = station_outliers(observations)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  station, (date, value, mean) \cf5 in\cf1  sorted(outliers.items()):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             print(f"\{station\}: \{date\}, \{value:.1f\}, \{mean:.1f\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  line, message \cf5 in\cf1  errors:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             print(f"Rejected line \{line\}: \{message\}")\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         write_statistics(sys.argv[\cf4 2\cf1 ], statistics)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  \cf4 0\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 except\cf1  (OSError, UnicodeError) \cf5 as\cf1  error:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(f"Could not access the weather data: \{error\}", file=sys.stderr)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  \cf4 1\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 if\cf1  __name__ == \cf3 "__main__"\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     sys.exit(main())\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 5 Unit tests\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 test_p5.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3 """Run with: python -m unittest -v test_p5.py (from this directory)."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  contextlib \cf5 import\cf1  redirect_stderr, redirect_stdout\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  importlib.util\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  io\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  pathlib \cf5 import\cf1  Path\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  tempfile \cf5 import\cf1  TemporaryDirectory\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 import\cf1  unittest\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 from\cf1  unittest.mock \cf5 import\cf1  patch\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf2 # Locate the solution even after its student-name placeholders are replaced.\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 SOURCE = next(Path(__file__).parent.glob(\cf3 "p5_*.py"\cf1 ))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 SPEC = importlib.util.spec_from_file_location(\cf3 "weather"\cf1 , SOURCE)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 weather = importlib.util.module_from_spec(SPEC)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1 SPEC.loader.exec_module(weather)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 class\cf1  WeatherTests(unittest.TestCase):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Exercise input validation, calculations, output and error handling."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  setUp(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Create an isolated directory for each test."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.folder = TemporaryDirectory()\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.addCleanup(self.folder.cleanup)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.input = Path(self.folder.name) / \cf3 "input.csv"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.output = Path(self.folder.name) / \cf3 "output.csv"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  read(self, content: str) -> tuple:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Write a fixture and return its parsed observations and errors."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.input.write_text(content, encoding=\cf3 "utf-8"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 return\cf1  weather.read_observations(str(self.input))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_several_stations_and_negative_temperatures(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Keep valid observations for distinct stations, including negatives."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         observations, errors = self.read(\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "North,09:00:00 AM 01/01/2026,-12.5\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "South,09:00:00 AM 01/01/2026,20\\n"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(errors, [])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(set(observations), \{\cf3 "North"\cf1 , \cf3 "South"\cf1 \})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(observations[\cf3 "North"\cf1 ][\cf4 0\cf1 ][\cf4 1\cf1 ], -\cf4 12.5\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_chronological_sort(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Sort across years and noon by datetime rather than date text."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         observations, _ = self.read(\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "A,01:00:00 PM 01/01/2026,3\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "A,11:00:00 PM 12/31/2025,1\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "A,09:00:00 AM 01/01/2026,2\\n"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual([value \cf5 for\cf1  _, value \cf5 in\cf1  observations[\cf3 "A"\cf1 ]], [\cf4 1\cf1 , \cf4 2\cf1 , \cf4 3\cf1 ])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_duplicate_observations(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Reject repeat station/date pairs and keep the first valid value."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         observations, errors = self.read(\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "A,09:00:00 AM 01/01/2026,10\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "A,09:00:00 AM 01/01/2026,30\\n"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(len(observations[\cf3 "A"\cf1 ]), \cf4 1\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(observations[\cf3 "A"\cf1 ][\cf4 0\cf1 ][\cf4 1\cf1 ], \cf4 10\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(errors[\cf4 0\cf1 ][\cf4 0\cf1 ], \cf4 2\cf1 )\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 5 Unit tests continued\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 test_p5.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertIn(\cf3 "Duplicate"\cf1 , errors[\cf4 0\cf1 ][\cf4 1\cf1 ])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_invalid_ranges_and_nonfinite_values(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Accept both range endpoints; reject outside values, NaN and infinity."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         observations, errors = self.read(\cf3 ""\cf1 .join(\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             f"S\{i\},09:00:00 AM 01/01/2026,\{value\}\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 for\cf1  i, value \cf5 in\cf1  enumerate([-\cf4 100\cf1 , \cf4 150\cf1 , -\cf4 100.1\cf1 , \cf4 150.1\cf1 , \cf3 "nan"\cf1 , \cf3 "inf"\cf1 ])))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(set(observations), \{\cf3 "S0"\cf1 , \cf3 "S1"\cf1 \})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual([line \cf5 for\cf1  line, _ \cf5 in\cf1  errors], [\cf4 3\cf1 , \cf4 4\cf1 , \cf4 5\cf1 , \cf4 6\cf1 ])\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_malformed_lines(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Report blank lines, wrong fields, invalid dates and bad numbers."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         observations, errors = self.read(\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "\\nA,date\\n,09:00:00 AM 01/01/2026,2\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "A,09:00:00 AM 02/30/2026,2\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 "A,09:00:00 AM 01/01/2026,hot\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf3 '"unterminated,date,3\\n'\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(observations, \{\})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual([line \cf5 for\cf1  line, _ \cf5 in\cf1  errors], list(range(\cf4 1\cf1 , \cf4 7\cf1 )))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_statistics_and_outliers(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Check exact statistics and strict greater-than outlier comparison."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         observations = \{\cf3 "A"\cf1 : [(\cf3 "earlier"\cf1 , -\cf4 10\cf1 ), (\cf3 "later"\cf1 , \cf4 20\cf1 )],\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         \cf3 "B"\cf1 : [(\cf3 "earlier"\cf1 , \cf4 20\cf1 ), (\cf3 "later"\cf1 , \cf4 10\cf1 )],\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                         \cf3 "C"\cf1 : [(\cf3 "only"\cf1 , \cf4 5\cf1 )]\}\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(weather.station_statistics(observations),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                          \{\cf3 "A"\cf1 : (-\cf4 10\cf1 , \cf4 20\cf1 , \cf4 5\cf1 ), \cf3 "B"\cf1 : (\cf4 10\cf1 , \cf4 20\cf1 , \cf4 15\cf1 ), \cf3 "C"\cf1 : (\cf4 5\cf1 , \cf4 5\cf1 , \cf4 5\cf1 )\})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(weather.station_outliers(observations),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                          \{\cf3 "A"\cf1 : (\cf3 "later"\cf1 , \cf4 20\cf1 , \cf4 5\cf1 )\})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_sorted_output_and_one_decimal(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Write lexicographic station order and exactly one decimal digit."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         weather.write_statistics(str(self.output),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                                  \{\cf3 "Zulu"\cf1 : (\cf4 1\cf1 , \cf4 2\cf1 , \cf4 1.5\cf1 ), \cf3 "Alpha"\cf1 : (-\cf4 5\cf1 , \cf4 0\cf1 , -\cf4 2.5\cf1 )\})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(self.output.read_text(encoding=\cf3 "utf-8"\cf1 ),\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                          \cf3 "station,min,max,mean\\nAlpha,-5.0,0.0,-2.5\\n"\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                          \cf3 "Zulu,1.0,2.0,1.5\\n"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_missing_files(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Propagate access errors from the reader and writer."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  self.assertRaises(FileNotFoundError):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             weather.read_observations(str(self.input))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  self.assertRaises(FileNotFoundError):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             weather.write_statistics(str(self.input / \cf3 "missing.csv"\cf1 ), \{\})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_empty_input(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Empty input produces empty results without calculation errors."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(self.read(\cf3 ""\cf1 ), (\{\}, []))\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(weather.station_statistics(\{\}), \{\})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertEqual(weather.station_outliers(\{\}), \{\})\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_main_handles_file_errors_and_usage(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Return failure without a traceback for usage and access errors."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 for\cf1  arguments \cf5 in\cf1  [[\cf3 "weather.py"\cf1 ],\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                           [\cf3 "weather.py"\cf1 , str(self.input), str(self.output)]]:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 with\cf1  patch.object(weather.sys, \cf3 "argv"\cf1 , arguments):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 \cf5 with\cf1  redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Problem 5 Unit tests continued\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 test_p5.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                     self.assertEqual(weather.main(), \cf4 1\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 def\cf1  test_main_success(self) -> \cf5 None\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf3 """Run the complete command-line workflow and verify its output."""\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.read(\cf3 "A,09:00:00 AM 01/01/2026,12.5\\n"\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         \cf5 with\cf1  patch.object(weather.sys, \cf3 "argv"\cf1 ,\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                           [\cf3 "weather.py"\cf1 , str(self.input), str(self.output)]):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1             \cf5 with\cf1  redirect_stdout(io.StringIO()) \cf5 as\cf1  terminal:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1                 self.assertEqual(weather.main(), \cf4 0\cf1 )\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertIn(\cf3 "A: 12.5, 12.5, 12.5"\cf1 , terminal.getvalue())\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         self.assertTrue(self.output.exists())\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 if\cf1  __name__ == \cf3 "__main__"\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     unittest.main(verbosity=\cf4 2\cf1 )\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \par
+\pard\f0\fs22\b\sl280\slmult0\sa140 \cf1 Required screenshots\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 [Insert authentic screenshots of every prompt and answer from the coding agent inside VSCode. Your name or FAU ID must be visible in the application and must not be added to the images.]\par
+\page \pard\f0\fs28\b\sl360\slmult0\sa180 \cf1 Supplied testif module\par
+\pard\f0\fs20\b0\sl260\slmult0\sa120 \cf1 testif.py\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf2 # testif module \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf5 def\cf1  testif(b, testname, msgOK=\cf3 ""\cf1 , msgFailed=\cf3 ""\cf1 ):\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf3 """Function used for testing. \par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     param b: boolean, normally a tested condition: true if test passed, false otherwise\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     param testname: the test name\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     param msgOK: string to be printed if param b==True  ( test condition true)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     param msgFailed: string to be printed if param b==False\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     returns b\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf3     """\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 if\cf1  b:\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(\cf3 "Success: "\cf1 + testname + \cf3 "; "\cf1  + msgOK)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 else\cf1 :\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1         print(\cf3 "Failed: "\cf1 + testname + \cf3 "; "\cf1  + msgFailed)\par
+\pard\f1\fs17\b0\sl200\slmult0\sa0 \cf1     \cf5 return\cf1  b\par
+}
