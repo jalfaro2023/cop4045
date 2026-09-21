@@ -1,0 +1,46 @@
+Before sending this prompt, make your name or
+FAU ID visible in VSCode (for example, in the source and integrated terminal).
+Capture every actual prompt and answer for the homework report.
+
+PROMPT TO PASTE INTO YOUR VSCODE CODING AGENT
+
+I am Jorge Alfaro (FAU ID: Z23697022), completing Python Programming Homework 2, Problem 5.
+The attached draft was prepared with Codex desktop. I am now working with you
+inside VSCode to review, improve, run, and understand the solution. Please make
+any necessary corrections directly in the files and explain the result.
+
+Read p5_Alfaro_Jorge.py and test_p5.py in the p5 directory (or their
+renamed versions). Keep the implementation concise, clearly organized, and
+appropriate for a Python programming class. Use only the standard library.
+
+Check every requirement:
+1. Read headerless station,date,temperature input, where temperature is a float
+   between -100.0 and 150.0 inclusive. Example date: 09:28:09 AM 04/20/2026.
+2. read_observations(filename) returns (observations, errors). observations maps
+   each station to (date, temperature) tuples sorted by date using
+   datetime.datetime. Reject malformed lines, invalid temperatures and duplicate
+   station/date combinations. errors contains (line_number, error_message).
+3. station_statistics(observations) maps stations to minimum, maximum and mean.
+4. station_outliers(observations) calls station_statistics and uses a dictionary
+   comprehension to map stations whose latest temperature exceeds their mean to
+   (date, temperature, mean).
+5. write_statistics(filename, statistics) writes stations in lexicographic order
+   and numeric values with exactly one decimal digit. Explain the handout's
+   ambiguous reference to also writing observations, because this function
+   receives statistics only. Do not silently change its required signature.
+6. main() reads input and output paths from sys.argv, prints statistics and
+   outliers, writes statistics, and catches file-access errors gracefully.
+7. At least six unittest methods must cover several stations, negative values,
+   duplicates, invalid ranges, calculated statistics, sorted output and missing
+   files. Run the entire test suite and the sample command-line program.
+
+Report actual test results and any changes. Explain how each function works so
+I can understand and discuss the submission. Do not claim that screenshots,
+GitHub pushes, or other actions occurred unless they actually occurred.
+
+AFTER THE AGENT RESPONDS
+
+Capture the response with your name or FAU ID visible. If you send a follow-up
+prompt, capture that prompt and its response too. Include the final source code
+and those images in the Word report, then export the updated PDF. Preserve the
+truthful record that the first draft originated in Codex desktop.
